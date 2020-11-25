@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pegasus Beta</string>
+    <string name="title_home">Profil</string>
+    <string name="title_dashboard">Workouts</string>
+    <string name="title_notifications">Inställningar</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

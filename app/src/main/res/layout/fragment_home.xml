@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="357dp"
+        android:layout_height="266dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.421">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="172dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Din hästs namn"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtHorseName"
+                android:layout_width="174dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Placerholder Name"
+                android:textSize="18sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="172dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Din hästs höjd"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtHorseHeight"
+                android:layout_width="174dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="150cm"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txtHorseName3"
+                android:layout_width="174dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Placerholder Name"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/distTrav"
+                android:layout_width="172dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Din hästs namn"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txtHorseName4"
+                android:layout_width="174dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Placerholder Name"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/distGall"
+                android:layout_width="172dp"
+                android:layout_height="35dp"
+                android:gravity="center|start"
+                android:text="Din hästs namn"
+                android:textSize="18sp" />
+        </TableRow>
+    </TableLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

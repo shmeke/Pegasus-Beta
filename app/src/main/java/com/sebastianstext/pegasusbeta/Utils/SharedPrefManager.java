@@ -12,7 +12,6 @@ public class SharedPrefManager {
     private static final String SHARED_PREF_NAME = "simplifiedcodingsharedpref";
     private static final String KEY_USERNAME = "keyusername";
     private static final String KEY_EMAIL = "keyemail";
-    private static final String KEY_GENDER = "keygender";
     private static final String KEY_ID = "keyid";
     private static final String KEY_SPEED = "keyspeed";
     private static final String KEY_STOPS = "keystops";

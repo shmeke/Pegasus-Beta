@@ -23,8 +23,7 @@ import androidx.navigation.ui.NavigationUI;
 public class MainActivity extends AppCompatActivity {
     User user;
     TextView txtUsername, txtLogout;
-    Bundle bundle;
-    HomeFragment homeFragment;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -34,9 +33,7 @@ public class MainActivity extends AppCompatActivity {
         user = SharedPrefManager.getInstance(this).getUser();
         txtUsername = findViewById(R.id.txtUsername);
         txtLogout = findViewById(R.id.txtLogout);
-        bundle = new Bundle();
         txtUsername.setText("Inloggad som: " + user.getUsername());
-        homeFragment = new HomeFragment();
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

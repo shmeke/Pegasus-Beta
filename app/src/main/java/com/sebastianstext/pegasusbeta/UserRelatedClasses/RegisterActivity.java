@@ -160,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
                         //starting the profile activity
                         finish();
 
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), AdditionalUserInfoActivity.class));
                     } else {
                         Toast.makeText(getApplicationContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
                     }

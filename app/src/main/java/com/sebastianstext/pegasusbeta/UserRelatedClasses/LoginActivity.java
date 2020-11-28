@@ -14,14 +14,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.sebastianstext.pegasusbeta.MainActivity;
 import com.sebastianstext.pegasusbeta.R;
+import com.sebastianstext.pegasusbeta.Utils.Horse;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
 import com.sebastianstext.pegasusbeta.Utils.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
@@ -94,6 +97,30 @@ public class LoginActivity extends AppCompatActivity {
                 super.onPostExecute(s);
                 progressBar.setVisibility(View.GONE);
 
+                try {
+                    //converting response to json object
+                    JSONObject obj = new JSONObject(s);
+                    ArrayList<String> HorseList = new ArrayList<>();
+                    //if no error in response
+                    if (!obj.getBoolean("error")) {
+                        Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+
+                        //getting the user from the response
+                        JSONArray jArray = new JSONArray("horse");
+                        for(int i = 0; i < jArray.length(); i++){
+                            JSONObject jObj = jArray.getJSONObject(i);
+                            HorseList.add(jObj.getString("name"));
+                        }
+
+                        //storing the user in shared preferences
+                        SharedPrefManager.getInstance(getApplicationContext()).horseArray(HorseList);
+                        Toast.makeText(getApplicationContext(), (CharSequence) HorseList, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 try {
                     //converting response to json object

@@ -4,7 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sebastianstext.pegasusbeta.MainActivity;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SharedPrefManager {
 
@@ -16,8 +23,10 @@ public class SharedPrefManager {
     private static final String KEY_SPEED = "keyspeed";
     private static final String KEY_STOPS = "keystops";
     private static final String KEY_DIST = "keydist";
-    private static final String KEY_HORSE = "keyhorse";
-    private static final String KEY_HORSEHEIGHT = "keyhorseheight";
+    private static final String KEY_NAME = "keyname";
+    private static final String KEY_HEIGHT = "keyheight";
+    private static final String KEY_RACE = "keyrace";
+    private static final String[] KEY_NAMEARRAY = new String[0];
 
     private static SharedPrefManager mInstance;
     private static Context mCtx;
@@ -42,6 +51,22 @@ public class SharedPrefManager {
         editor.putString(KEY_USERNAME, user.getUsername());
         editor.putString(KEY_EMAIL, user.getEmail());
         editor.apply();
+    }
+
+    public void horseArray(ArrayList<String> horseList) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(horseList);
+        editor.putString(KEY_NAME, json);
+        editor.apply();
+    }
+    public ArrayList<String> loadHorse() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(KEY_NAME, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        return gson.fromJson(json, type);
     }
 
     public void workouts(WorkoutsList workoutsList){
@@ -70,6 +95,8 @@ public class SharedPrefManager {
                 sharedPreferences.getString(KEY_EMAIL, null)
         );
     }
+
+
 
     public WorkoutsList getWorkout(){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -17,6 +18,7 @@ import com.sebastianstext.pegasusbeta.R;
 import com.sebastianstext.pegasusbeta.Utils.Horse;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
+import com.sebastianstext.pegasusbeta.Utils.TinyDB;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
 import com.sebastianstext.pegasusbeta.Utils.User;
 
@@ -44,7 +46,8 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.buttonLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userLogin();
+                getHorse();
+
             }
         });
 
@@ -94,33 +97,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                progressBar.setVisibility(View.GONE);
 
-                try {
-                    //converting response to json object
-                    JSONObject obj = new JSONObject(s);
-                    ArrayList<String> HorseList = new ArrayList<>();
-                    //if no error in response
-                    if (!obj.getBoolean("error")) {
-                        Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
-
-                        //getting the user from the response
-                        JSONArray jArray = new JSONArray("horse");
-                        for(int i = 0; i < jArray.length(); i++){
-                            JSONObject jObj = jArray.getJSONObject(i);
-                            HorseList.add(jObj.getString("name"));
-                        }
-
-                        //storing the user in shared preferences
-                        SharedPrefManager.getInstance(getApplicationContext()).horseArray(HorseList);
-                        Toast.makeText(getApplicationContext(), (CharSequence) HorseList, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Invalid username or password", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
                 try {
                     //converting response to json object
@@ -172,4 +149,65 @@ public class LoginActivity extends AppCompatActivity {
         UserLogin ul = new UserLogin();
         ul.execute();
     }
+
+    public void getHorse(){
+
+        final String username = editTextUsername.getText().toString();
+
+        class GetHorse extends AsyncTask<Void, Void, String>{
+
+            public void onPreExecute(){
+                super.onPreExecute();
+            }
+
+            public void onPostExecute(String h){
+                super.onPostExecute(h);
+
+
+        try{
+            String json = h.replace(":\"[{", ":[{");
+                    String jsonSecond = json.replace("}]\"", "}]");
+                            String jsonFinal = jsonSecond.replace("\\\"", "\"");
+                            
+            Log.i("tagconvertstr", jsonFinal);
+            JSONObject obj = new JSONObject(jsonFinal);
+
+            ArrayList<String> HorseList = new ArrayList<>();
+            //getting the user from the response
+
+            JSONArray jArray = obj.getJSONArray("horse");
+            for(int i = 0; i < jArray.length(); i++){
+                JSONObject jObj = jArray.getJSONObject(i);
+                HorseList.add(jObj.getString("name"));
+
+            }
+
+            SharedPrefManager.getInstance(getApplicationContext()).saveArrayList(HorseList, "horselist");
+            userLogin();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+            }
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                //creating request handler object
+                RequestHandler requestHandler = new RequestHandler();
+
+                //creating request parameters
+                HashMap<String, String> params = new HashMap<>();
+                params.put("username", username);
+
+                //returning the response
+                return requestHandler.sendPostRequest(URLs.URL_GETHORSE, params);
+            }
+        }
+        GetHorse ul = new GetHorse();
+        ul.execute();
+
+    }
+
 }

@@ -25,7 +25,7 @@ public class SharedPrefManager {
     private static final String KEY_DIST = "keydist";
     private static final String KEY_NAME = "keyname";
     private static final String KEY_HEIGHT = "keyheight";
-    private static final String KEY_RACE = "keyrace";
+    private static final String KEY_BREED = "keybreed";
     private static final String[] KEY_NAMEARRAY = new String[0];
 
     private static SharedPrefManager mInstance;
@@ -53,21 +53,34 @@ public class SharedPrefManager {
         editor.apply();
     }
 
-    public void horseArray(ArrayList<String> horseList) {
+    public void putHorse(Horse horse) {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(horseList);
-        editor.putString(KEY_NAME, json);
+        editor.putString(KEY_NAME, horse.getName());
+        editor.putString(KEY_BREED, horse.getBreed());
+        editor.putInt(KEY_HEIGHT, horse.getHeight());
         editor.apply();
     }
-    public ArrayList<String> loadHorse() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+
+    public void saveArrayList(ArrayList<String> list, String key){
+        SharedPreferences prefs = SharedPrefManager.mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();
-        String json = sharedPreferences.getString(KEY_NAME, null);
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();
+
+    }
+
+    public ArrayList<String> getArrayList(String key){
+        SharedPreferences prefs = SharedPrefManager.mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
         return gson.fromJson(json, type);
     }
+
+
 
     public void workouts(WorkoutsList workoutsList){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -96,7 +109,14 @@ public class SharedPrefManager {
         );
     }
 
-
+    public Horse getHorse() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return new Horse(
+                sharedPreferences.getString(KEY_NAME, null),
+                sharedPreferences.getString(KEY_BREED, null),
+                sharedPreferences.getInt(KEY_HEIGHT, -1)
+        );
+    }
 
     public WorkoutsList getWorkout(){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);

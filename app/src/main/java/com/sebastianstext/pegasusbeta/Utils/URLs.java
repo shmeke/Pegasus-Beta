@@ -9,6 +9,7 @@ public class URLs {
     public static final String URL_TEMPWORKOUT = ROOT_URL + "tempworkout";
     public static final String URL_DATESPINNER = ROOT_URL + "getspinnerdates";
     public static final String URL_GETWORKOUTS = ROOT_URL + "getWorkouts";
+    public static final String URL_GETHORSE = ROOT_URL + "gethorse";
 
 
 }

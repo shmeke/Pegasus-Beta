@@ -3,6 +3,9 @@
     package="com.sebastianstext.pegasusbeta">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -18,9 +21,9 @@
 
         <activity android:name=".MainActivity" />
         <activity android:name=".UserRelatedClasses.AdditionalUserInfoActivity"/>
-        <activity android:name=".UserRelatedClasses.LoginActivity" />
+        <activity android:name=".UserRelatedClasses.RegisterActivity" />
         <activity
-            android:name=".UserRelatedClasses.RegisterActivity"
+            android:name=".UserRelatedClasses.LoginActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

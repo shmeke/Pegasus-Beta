@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -102,7 +103,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         //if it passes all the validations
 
-        @SuppressLint("StaticFieldLeak")
+
         class RegisterUser extends AsyncTask<Void, Void, String> {
 
             private ProgressBar progressBar;
@@ -126,7 +127,7 @@ public class RegisterActivity extends AppCompatActivity {
             protected void onPreExecute() {
                 super.onPreExecute();
                 //displaying the progress bar while user registers on the server
-                progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                progressBar = findViewById(R.id.progressBar);
                 progressBar.setVisibility(View.VISIBLE);
             }
 
@@ -137,6 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
 
                 try {
+                    Log.i("tagconvertstr", "["+s+"]");
                     //converting response to json object
                     JSONObject obj = new JSONObject(s);
 

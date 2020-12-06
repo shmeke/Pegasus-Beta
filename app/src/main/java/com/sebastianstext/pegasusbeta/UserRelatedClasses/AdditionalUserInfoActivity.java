@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,7 +64,7 @@ public class AdditionalUserInfoActivity extends AppCompatActivity {
         final String HorseHeight = txtHorseHeight.getText().toString().trim();
 
 
-        @SuppressLint("StaticFieldLeak")
+
         class SubmitAdditionalInfo extends AsyncTask<Void, Void, String> {
 
 
@@ -77,7 +78,7 @@ public class AdditionalUserInfoActivity extends AppCompatActivity {
                 params.put("id", Id);
                 params.put("username", Username);
                 params.put("name", HorseName);
-                params.put("race", HorseRace);
+                params.put("breed", HorseRace);
                 params.put("height", HorseHeight);
 
                 //returing the response
@@ -98,22 +99,26 @@ public class AdditionalUserInfoActivity extends AppCompatActivity {
 
 
                 try {
+                    Log.i("tagconvertstr", "["+s+"]");
                     //converting response to json object
                     JSONObject obj = new JSONObject(s);
-                    ArrayList<String> HorseList = new ArrayList<>();
+
                     //if no error in response
                     if (!obj.getBoolean("error")) {
                         Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
 
-                        //getting the user from the response
-                        JSONArray jArray = new JSONArray("horse");
-                        for(int i = 0; i < jArray.length(); i++){
-                            JSONObject jObj = jArray.getJSONObject(i);
-                            HorseList.add(jObj.getString("name"));
-                        }
+                        JSONObject userJson = obj.getJSONObject("horse");
+
+                        //creating a new user object
+                        Horse horse = new Horse(
+                                userJson.getString("name"),
+                                userJson.getString("breed"),
+                                userJson.getInt("height")
+                        );
+
 
                         //storing the user in shared preferences
-                        SharedPrefManager.getInstance(getApplicationContext()).horseArray(HorseList);
+                        SharedPrefManager.getInstance(getApplicationContext()).putHorse(horse);
 
                         //starting the profile activity
                         finish();

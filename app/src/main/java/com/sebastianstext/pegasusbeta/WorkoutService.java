@@ -87,9 +87,9 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         sm.registerListener(WorkoutService.this, rotation, SensorManager.SENSOR_DELAY_NORMAL);
 
         Instant start = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
             start = Instant.now();
-        }
+
         Start = start;
     }
 

@@ -6,12 +6,12 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sebastianstext.pegasusbeta.MainActivity;
+import com.sebastianstext.pegasusbeta.DataStorage.Horse;
+import com.sebastianstext.pegasusbeta.DataStorage.User;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 public class SharedPrefManager {
 
@@ -113,8 +113,9 @@ public class SharedPrefManager {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return new Horse(
                 sharedPreferences.getString(KEY_NAME, null),
-                sharedPreferences.getString(KEY_BREED, null),
-                sharedPreferences.getInt(KEY_HEIGHT, -1)
+                sharedPreferences.getInt(KEY_HEIGHT, -1),
+                sharedPreferences.getString(KEY_BREED, null)
+
         );
     }
 

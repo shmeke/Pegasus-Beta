@@ -2,6 +2,8 @@ package com.sebastianstext.pegasusbeta.SensorDetectors;
 
 import com.sebastianstext.pegasusbeta.Listeners.rotationListener;
 
+import java.text.ParseException;
+
 public class RotationDetector {
 
     private rotationListener listener;
@@ -16,7 +18,7 @@ public class RotationDetector {
 
     public void registerListener(rotationListener listener) { this.listener = listener; }
 
-    public void detectTurning(long timeNs, float x, float y, float z){
+    public void detectTurning(long timeNs, float x, float y, float z) throws ParseException {
 
         float degree = Math.round(x);
 

@@ -3,6 +3,8 @@ package com.sebastianstext.pegasusbeta.SensorDetectors;
 import com.sebastianstext.pegasusbeta.Listeners.stepListener;
 import com.sebastianstext.pegasusbeta.Utils.SensorFilter;
 
+import java.text.ParseException;
+
 public class StepDetector {
     private static final int ACCEL_RING_SIZE = 50;
     private static final int VEL_RING_SIZE = 10;
@@ -29,7 +31,7 @@ public class StepDetector {
     }
 
 
-    public void updateAccel(long timeNs, float x, float y, float z) {
+    public void updateAccel(long timeNs, float x, float y, float z) throws ParseException {
         float[] currentAccel = new float[3];
         currentAccel[0] = x;
         currentAccel[1] = y;

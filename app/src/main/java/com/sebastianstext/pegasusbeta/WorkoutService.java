@@ -9,15 +9,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.sebastianstext.pegasusbeta.DataStorage.Horse;
 import com.sebastianstext.pegasusbeta.Listeners.rotationListener;
 import com.sebastianstext.pegasusbeta.Listeners.stepListener;
 import com.sebastianstext.pegasusbeta.SensorDetectors.RotationDetector;
@@ -25,13 +22,14 @@ import com.sebastianstext.pegasusbeta.SensorDetectors.StepDetector;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
-import com.sebastianstext.pegasusbeta.Utils.User;
+import com.sebastianstext.pegasusbeta.DataStorage.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -45,30 +43,30 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+
+
     SensorManager sm;
     Sensor accel;
     Sensor rotation;
     private StepDetector simpleStepDetector;
     private RotationDetector turnDetect;
     private int numSteps, movementType, stepsTrav, stepsSkritt, stepsGallop;
-    private int leftTurn, rightTurn, fullLeftVolt, fullRightVolt,quarterVoltLeft, quarterVoltRight;
-    private int oldStepCount;
-    private int stopCount, getTurnDirection;
-    private double meters, metersTrav, metersSkritt, metersGallop;
-    private double km;
+    private int leftTurn, rightTurn, fullLeftVolt, fullRightVolt,quarterVoltLeft, quarterVoltRight, oldStepCount, stopCount, getTurnDirection;
+    private double meters, metersTrav, metersSkritt, metersGallop, km, kps;
     private float oldVelEst, newVelEst;
     private long stepTime;
-    static Instant Start;
-    private double kps;
     float stepTimeFin;
     private static final int RESET_TIMER = 1000;
     private static final int FINAL_RESET_TIMER = 5000;
-    Instant fiveIncomingLeft, fiveIncomingRight;
-    Instant oldTimeLeft = Instant.now();
-    Instant oldTimeRight = Instant.now();
-
+    @SuppressLint("SimpleDateFormat")
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+    Date start;
+    Date oldTimeLeft;
+    Date oldTimeRight;
+    Horse horse;
     User user;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -81,36 +79,43 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         turnDetect = new RotationDetector();
         turnDetect.registerListener(this);
         user = SharedPrefManager.getInstance(WorkoutService.this).getUser();
-
+        horse = SharedPrefManager.getInstance(WorkoutService.this).getHorse();
 
         sm.registerListener(WorkoutService.this, accel, SensorManager.SENSOR_DELAY_NORMAL);
         sm.registerListener(WorkoutService.this, rotation, SensorManager.SENSOR_DELAY_NORMAL);
+        start = new Date(System.currentTimeMillis());
 
-        Instant start = null;
 
-            start = Instant.now();
 
-        Start = start;
     }
+
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            simpleStepDetector.updateAccel(
-                    sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]);
+            try {
+                simpleStepDetector.updateAccel(
+                        sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
 
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ORIENTATION){
-            turnDetect.detectTurning(
-                    sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]
-            );
+            try {
+                turnDetect.detectTurning(
+                        sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]
+                );
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
         }
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void detectTurn(float currentDegree, float oldDegree, long turnTime, long lastTurnTime) {
+    public void detectTurn(float currentDegree, float oldDegree, long turnTime, long lastTurnTime) throws ParseException {
 
 
         if(oldDegree > currentDegree + 6.5f){
@@ -154,9 +159,12 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         switch (getTurnDirection) {
 
             case 1:
-                fiveIncomingLeft = Instant.now();
-                Duration timeSinceLeft = Duration.between(oldTimeLeft, fiveIncomingLeft);
-                int secLeft = (int) (timeSinceLeft.toMillis() * 1000);
+                Date fiveIncomingLeft = new Date(System.currentTimeMillis());
+
+                Date timeNewLeft = (Date) timeFormat.parse(String.valueOf(fiveIncomingLeft));
+                Date timeOldLeft = (Date) timeFormat.parse(String.valueOf(oldTimeLeft));
+                long timeDiffLeft = timeNewLeft.getTime() - timeOldLeft.getTime();
+                int secLeft = (int) (timeDiffLeft * 1000);
 
                 if(quarterVoltLeft == 4 && secLeft < FINAL_RESET_TIMER) {
                     fullLeftVolt++;
@@ -168,9 +176,12 @@ public class WorkoutService extends Service implements stepListener, rotationLis
                 break;
 
             case 2:
-                fiveIncomingRight = Instant.now();
-                Duration timeSinceRight = Duration.between(oldTimeRight, fiveIncomingRight);
-                int secRight = (int) (timeSinceRight.toMillis() * 1000);
+                Date fiveIncomingRight = new Date(System.currentTimeMillis());
+
+                Date timeNewRight = (Date) timeFormat.parse(String.valueOf(fiveIncomingRight));
+                Date timeOldRight = (Date) timeFormat.parse(String.valueOf(oldTimeLeft));
+                long timeDiffRight = timeNewRight.getTime() - timeOldRight.getTime();
+                int secRight = (int) (timeDiffRight * 1000);
 
                 if(quarterVoltRight == 4 && secRight < FINAL_RESET_TIMER) {
                     fullRightVolt++;
@@ -195,7 +206,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void tempWorkout(long timeNs,  long lastStepTimeNs, float velocityEstimate, float oldVelocityEstimate) {
+    public void tempWorkout(long timeNs,  long lastStepTimeNs, float velocityEstimate, float oldVelocityEstimate) throws ParseException {
         numSteps++;
         long startStep = lastStepTimeNs;
         oldVelEst = oldVelocityEstimate;
@@ -240,9 +251,13 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
         meters = (metersGallop + metersSkritt + metersTrav);
         km = (meters * 0.001);
-        Instant still = Instant.now();
-        Duration timeElapsed = Duration.between(Start, still);
-        float sec = timeElapsed.toMillis();
+        Date still = new Date(System.currentTimeMillis());
+        String Start = String.valueOf(start);
+        String Still = String.valueOf(still);
+        Date startTime = (Date) timeFormat.parse(Start);
+        Date stillTime = (Date) timeFormat.parse(Still);
+
+        long timeElapsed = stillTime.getTime() - startTime.getTime();
 
         if(oldStepCount < numSteps && stepTimeFin > 3000){
             stopCount++;
@@ -250,16 +265,27 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         }
         oldStepCount = numSteps;
 
-        kps = (km) / (sec * 3600);
+        kps = (km) / (timeElapsed * 3600);
     }
 
-    private void updateWorkoutSession(){
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        updateWorkoutSession();
+    }
+
+    public void updateWorkoutSession(){
         final String id = String.valueOf(user.getId());
         final String username = user.getUsername();
-        final String metersTravelled = String.valueOf(oldVelEst);
-        final String averageSpeed = String.valueOf(newVelEst);
-        final String stepTimeFinal = String.valueOf(stepTimeFin);
-
+        final String horsename = horse.getName();
+        final String metersTravelled = String.valueOf(meters);
+        final String averageSpeed = String.valueOf(kps);
+        final String stops = String.valueOf(stopCount);
+        final String distGallopp = String.valueOf(metersGallop);
+        final String distSkritt = String.valueOf(metersSkritt);
+        final String distTrav = String.valueOf(metersTrav);
+        final String voltRight = String.valueOf(fullRightVolt);
+        final String voltLeft = String.valueOf(fullLeftVolt);
 
         @SuppressLint("StaticFieldLeak")
         class UpdateWorkoutSession extends AsyncTask<Void, Void, String> {
@@ -273,12 +299,18 @@ public class WorkoutService extends Service implements stepListener, rotationLis
                 HashMap<String, String> params = new HashMap<>();
                 params.put("id", id);
                 params.put("username", username);
-                params.put("oldVelEst", metersTravelled);
-                params.put("newVelEst", averageSpeed);
-                params.put("stepTime", stepTimeFinal);
+                params.put("horsename", horsename);
+                params.put("meters", metersTravelled);
+                params.put("speed", averageSpeed);
+                params.put("stops", stops);
+                params.put("distgallopp", distGallopp);
+                params.put("distskritt", distSkritt);
+                params.put("disttrav", distTrav);
+                params.put("voltleft", voltLeft);
+                params.put("voltright", voltRight);
 
                 //returning the response
-                return requestHandler.sendPostRequest(URLs.URL_TEMPWORKOUT, params);
+                return requestHandler.sendPostRequest(URLs.URL_WORKOUT, params);
             }
 
             @Override

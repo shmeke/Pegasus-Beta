@@ -1,6 +1,5 @@
 package com.sebastianstext.pegasusbeta.UserRelatedClasses;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ import com.sebastianstext.pegasusbeta.R;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
-import com.sebastianstext.pegasusbeta.Utils.User;
+import com.sebastianstext.pegasusbeta.DataStorage.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;

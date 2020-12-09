@@ -15,12 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.sebastianstext.pegasusbeta.MainActivity;
 import com.sebastianstext.pegasusbeta.R;
-import com.sebastianstext.pegasusbeta.Utils.Horse;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
-import com.sebastianstext.pegasusbeta.Utils.TinyDB;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
-import com.sebastianstext.pegasusbeta.Utils.User;
+import com.sebastianstext.pegasusbeta.DataStorage.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +58,8 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
             }
         });
+
+
     }
 
     private void userLogin() {

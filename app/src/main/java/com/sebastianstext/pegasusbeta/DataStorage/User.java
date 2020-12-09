@@ -1,4 +1,4 @@
-package com.sebastianstext.pegasusbeta.Utils;
+package com.sebastianstext.pegasusbeta.DataStorage;
 
 public class User {
     private int id;

@@ -1,239 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"/>
 
-    <TextView
-        android:id="@+id/txtUsername"
-        android:layout_width="219dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center|start"
-        android:spinnerMode="dialog"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/tableLayout"
-        app:layout_constraintEnd_toStartOf="@+id/textView2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UnknownId" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="302dp"
-        android:layout_height="126dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginLeft="52dp"
-        android:layout_marginEnd="52dp"
-        android:layout_marginRight="52dp"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtUsername">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="126dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Välj häst"
-                android:textAllCaps="false"
-                android:textColor="@color/colorAccent"
-                android:textSize="18sp" />
-
-            <Spinner
-                android:id="@+id/spinnerHorse"
-                android:layout_width="162dp"
-                android:layout_height="match_parent"
-                android:autofillHints="Välj häst" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="35dp" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="129dp"
-                android:layout_height="32dp"
-                android:gravity="center|start"
-                android:text="Ras" />
-
-            <TextView
-                android:id="@+id/txtBreed"
-                android:layout_width="162dp"
-                android:layout_height="match_parent"
-                android:gravity="center" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="327dp"
-            android:layout_height="67dp">
-
-            <TextView
-                android:id="@+id/textView15"
-                android:layout_width="139dp"
-                android:layout_height="match_parent"
-                android:gravity="center|start"
-                android:text="Höjd" />
-
-            <TextView
-                android:id="@+id/txtHeight"
-                android:layout_width="129dp"
-                android:layout_height="32dp"
-                android:gravity="center" />
-        </TableRow>
-    </TableLayout>
-
-    <ScrollView
-        android:id="@+id/scrollView2"
-        android:layout_width="409dp"
-        android:layout_height="496dp"
-        android:layout_marginStart="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/stroke_bg"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
+
 
             <TextView
-                android:id="@+id/textView16"
-                style="@style/Widget.MaterialComponents.MaterialCalendar.HeaderSelection"
-                android:layout_width="187dp"
-                android:layout_height="38dp"
-                android:gravity="center"
-                android:text="Ridpass"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
-                android:textColor="@color/colorAccent"
-                android:textSize="8sp"
-                android:textStyle="normal|bold"
-                app:fontFamily="sans-serif-medium"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/txtUsername"
+                android:layout_width="219dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="49dp"
+                android:gravity="center|start"
+                android:spinnerMode="dialog"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@+id/tableLayout"
+                app:layout_constraintEnd_toStartOf="@+id/textView2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.42" />
-
-            <Button
-                android:id="@+id/buttonStart"
-                style="@android:style/Widget.Holo.Button"
-                android:layout_width="111dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="88dp"
-                android:layout_marginLeft="88dp"
-                android:layout_marginEnd="9dp"
-                android:layout_marginRight="9dp"
-                android:background="@color/colorAccent"
-                android:text="Starta pass"
-                app:layout_constraintEnd_toStartOf="@+id/buttonStop"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="52dp" />
-
-            <Button
-                android:id="@+id/buttonStop"
-                style="@android:style/Widget.Holo.Button"
-                android:layout_width="111dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="90dp"
-                android:layout_marginRight="90dp"
-                android:background="@android:color/holo_red_light"
-                android:text="Avsluta pass"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/buttonStart"
-                tools:layout_editor_absoluteY="52dp" />
+                tools:ignore="UnknownId" />
 
             <TableLayout
-                android:id="@+id/tableLayout3"
-                android:layout_width="329dp"
+                android:id="@+id/tableLayout"
+                android:layout_width="287dp"
                 android:layout_height="27dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginStart="52dp"
+                android:layout_marginLeft="52dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginRight="52dp"
+                app:layout_constraintBottom_toTopOf="@+id/scrollView2"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.4"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView16">
+                app:layout_constraintTop_toBottomOf="@+id/txtUsername">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/textView21"
-                        android:layout_width="174dp"
+                        android:id="@+id/textView4"
+                        android:layout_width="126dp"
                         android:layout_height="match_parent"
-                        android:text="Välj datum" />
+                        android:gravity="center"
+                        android:text="Välj häst"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="18sp" />
 
-                    <EditText
-                        android:id="@+id/editTextDate"
-                        android:layout_width="117dp"
+                    <Spinner
+                        android:id="@+id/spinnerHorse"
+                        android:layout_width="162dp"
                         android:layout_height="match_parent"
-                        android:ems="10"
-                        android:inputType="date" />
-
-                    <ImageButton
-                        android:id="@+id/buttonDropdown"
-                        android:layout_width="35dp"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/ic_button_calendar" />
-
+                        android:autofillHints="Välj häst" />
                 </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
             </TableLayout>
 
-            <ExpandableListView
-                android:id="@+id/listDist"
-                android:layout_width="329dp"
-                android:layout_height="249dp"
+            <ScrollView
+                android:id="@+id/scrollView2"
+                android:layout_width="409dp"
+                android:layout_height="496dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginLeft="3dp"
+                android:layout_marginEnd="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/stroke_bg"
+                android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tableLayout3"
-                app:layout_constraintVertical_bias="0.0">
+                app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                app:layout_constraintVertical_bias="1.0">
 
-            </ExpandableListView>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/txtInProgress"
-                android:layout_width="208dp"
-                android:layout_height="32dp"
-                android:gravity="center"
-                android:textSize="18sp"
-                app:fontFamily="sans-serif-medium"
-                tools:layout_editor_absoluteX="100dp"
-                tools:layout_editor_absoluteY="122dp" />
+                    <TextView
+                        android:id="@+id/textView16"
+                        style="@style/Widget.MaterialComponents.MaterialCalendar.HeaderSelection"
+                        android:layout_width="187dp"
+                        android:layout_height="38dp"
+                        android:gravity="center"
+                        android:text="Ridpass"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="8sp"
+                        android:textStyle="normal|bold"
+                        app:fontFamily="sans-serif-medium"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.323" />
+
+                    <Button
+                        android:id="@+id/buttonStart"
+                        style="@android:style/Widget.Holo.Button"
+                        android:layout_width="111dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="88dp"
+                        android:layout_marginLeft="88dp"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginEnd="9dp"
+                        android:layout_marginRight="9dp"
+                        android:background="@color/colorAccent"
+                        android:text="Starta pass"
+                        app:layout_constraintBottom_toTopOf="@+id/tableLayout3"
+                        app:layout_constraintEnd_toStartOf="@+id/buttonStop"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <Button
+                        android:id="@+id/buttonStop"
+                        style="@android:style/Widget.Holo.Button"
+                        android:layout_width="111dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginEnd="90dp"
+                        android:layout_marginRight="90dp"
+                        android:background="@android:color/holo_red_light"
+                        android:text="Avsluta pass"
+                        app:layout_constraintBottom_toTopOf="@+id/tableLayout3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/buttonStart"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <TableLayout
+                        android:id="@+id/tableLayout3"
+                        android:layout_width="329dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="32dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView16">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp">
+
+                            <TextView
+                                android:id="@+id/textView21"
+                                android:layout_width="176dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center|start"
+                                android:text="Välj datum" />
+
+                            <EditText
+                                android:id="@+id/editTextDate"
+                                android:layout_width="117dp"
+                                android:layout_height="35dp"
+                                android:ems="10"
+                                android:inputType="date" />
+
+                            <ImageButton
+                                android:id="@+id/buttonDropdown"
+                                android:layout_width="35dp"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_button_calendar" />
+
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <ExpandableListView
+                        android:id="@+id/listDist"
+                        android:layout_width="327dp"
+                        android:layout_height="243dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tableLayout3">
+
+                    </ExpandableListView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </ScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

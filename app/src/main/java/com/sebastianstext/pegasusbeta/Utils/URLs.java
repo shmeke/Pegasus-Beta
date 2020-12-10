@@ -8,6 +8,6 @@ public class URLs {
     public static final String URL_ADINFO= ROOT_URL + "horseinfo";
     public static final String URL_WORKOUT = ROOT_URL + "workout";
     public static final String URL_GETHORSE = ROOT_URL + "gethorse";
-    public static final String URL_GETWORKOUT = ROOT_URL + "getworkout";
+    public static final String URL_GETWORKOUT = ROOT_URL + "getworkouts";
 
 }

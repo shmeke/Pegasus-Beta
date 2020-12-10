@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -56,16 +58,25 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     private float oldVelEst, newVelEst;
     private long stepTime;
     float stepTimeFin;
+    private String horseName;
     private static final int RESET_TIMER = 1000;
     private static final int FINAL_RESET_TIMER = 5000;
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-    Date start;
-    Date oldTimeLeft;
-    Date oldTimeRight;
+    Time start;
+    Time oldTimeLeft = new Time(System.currentTimeMillis());
+    Time oldTimeRight = new Time(System.currentTimeMillis());
     Horse horse;
     User user;
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        super.onStartCommand(intent, startId, startId);
+        Bundle extras = intent.getExtras();
+        horseName = extras.getString("spinnerItem");
+
+        return START_STICKY;
+    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate() {
@@ -83,7 +94,8 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
         sm.registerListener(WorkoutService.this, accel, SensorManager.SENSOR_DELAY_NORMAL);
         sm.registerListener(WorkoutService.this, rotation, SensorManager.SENSOR_DELAY_NORMAL);
-        start = new Date(System.currentTimeMillis());
+        start = new Time(System.currentTimeMillis());
+
 
 
 
@@ -159,11 +171,9 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         switch (getTurnDirection) {
 
             case 1:
-                Date fiveIncomingLeft = new Date(System.currentTimeMillis());
+                Time fiveIncomingLeft = new Time(System.currentTimeMillis());
 
-                Date timeNewLeft = (Date) timeFormat.parse(String.valueOf(fiveIncomingLeft));
-                Date timeOldLeft = (Date) timeFormat.parse(String.valueOf(oldTimeLeft));
-                long timeDiffLeft = timeNewLeft.getTime() - timeOldLeft.getTime();
+                long timeDiffLeft = fiveIncomingLeft.getTime() - oldTimeLeft.getTime();
                 int secLeft = (int) (timeDiffLeft * 1000);
 
                 if(quarterVoltLeft == 4 && secLeft < FINAL_RESET_TIMER) {
@@ -176,11 +186,10 @@ public class WorkoutService extends Service implements stepListener, rotationLis
                 break;
 
             case 2:
-                Date fiveIncomingRight = new Date(System.currentTimeMillis());
+                Time fiveIncomingRight = new Time(System.currentTimeMillis());
 
-                Date timeNewRight = (Date) timeFormat.parse(String.valueOf(fiveIncomingRight));
-                Date timeOldRight = (Date) timeFormat.parse(String.valueOf(oldTimeLeft));
-                long timeDiffRight = timeNewRight.getTime() - timeOldRight.getTime();
+
+                long timeDiffRight = fiveIncomingRight.getTime() - oldTimeRight.getTime();
                 int secRight = (int) (timeDiffRight * 1000);
 
                 if(quarterVoltRight == 4 && secRight < FINAL_RESET_TIMER) {
@@ -251,13 +260,12 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
         meters = (metersGallop + metersSkritt + metersTrav);
         km = (meters * 0.001);
-        Date still = new Date(System.currentTimeMillis());
-        String Start = String.valueOf(start);
-        String Still = String.valueOf(still);
-        Date startTime = (Date) timeFormat.parse(Start);
-        Date stillTime = (Date) timeFormat.parse(Still);
+        Time still = new Time(System.currentTimeMillis());
 
-        long timeElapsed = stillTime.getTime() - startTime.getTime();
+        //Time startTime = (Time) timeFormat.parse(String.valueOf(start));
+        //Time stillTime = (Time) timeFormat.parse(String.valueOf(still));
+
+        long timeElapsed = still.getTime() - start.getTime();
 
         if(oldStepCount < numSteps && stepTimeFin > 3000){
             stopCount++;
@@ -277,7 +285,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     public void updateWorkoutSession(){
         final String id = String.valueOf(user.getId());
         final String username = user.getUsername();
-        final String horsename = horse.getName();
+        final String horsename = horseName;
         final String metersTravelled = String.valueOf(meters);
         final String averageSpeed = String.valueOf(kps);
         final String stops = String.valueOf(stopCount);
@@ -323,21 +331,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
 
-                try {
-                    //converting response to json object
-                    JSONObject obj = new JSONObject(s);
 
-                    //if no error in response
-                    if (!obj.getBoolean("error")) {
-                        Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
-
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
 
         }

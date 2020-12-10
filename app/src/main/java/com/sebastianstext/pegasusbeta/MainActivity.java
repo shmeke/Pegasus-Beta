@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -43,8 +44,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     User user;
+    Workout workout;
     EditText txtDate;
     TextView txtUsername;
     ImageButton btnDropdown;
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private ExpandableListAdapter listAdapter;
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHash;
-
+    String spinnerItem;
 
     @SuppressLint("WrongViewCast")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         user = SharedPrefManager.getInstance(this).getUser();
+        workout = SharedPrefManager.getInstance(this).getWorkout();
         horseSpinner = findViewById(R.id.spinnerHorse);
         txtUsername = findViewById(R.id.txtUsername);
         txtDate = findViewById(R.id.editTextDate);
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         initData();
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
         listView.setAdapter(listAdapter);
-
+        horseSpinner.setOnItemSelectedListener(this);
         btnDropdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,23 +100,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, WorkoutService.class);
-                startService(i);
-            }
-        });
 
-        stop.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
-
-                Intent i = new Intent(MainActivity.this, WorkoutService.class);
-                stopService(i);
-            }
-        });
         txtDate.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -138,6 +125,41 @@ public class MainActivity extends AppCompatActivity {
         horseSpinner.setAdapter(spinnerHorseArray);
     }
 
+
+
+
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, WorkoutService.class);
+                i.putExtra("spinnerItem", spinnerItem);
+                startService(i);
+                Toast.makeText(MainActivity.this, "Ridpass startat.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        stop.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(MainActivity.this, WorkoutService.class);
+                stopService(i);
+                Toast.makeText(MainActivity.this, "Ridpass avslutat.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        spinnerItem = horseSpinner.getSelectedItem().toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     private void initData() {
@@ -150,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         List<String> dist = new ArrayList<>();
-        dist.add("Total distans:");
+        dist.add("Total distans:" + workout.getMeters());
         dist.add("Distans skrittat:");
         dist.add("Distans travat:");
         dist.add("Distans galopperat:");
@@ -258,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
     public void getWorkout(){
         final String HorseName = horseSpinner.getSelectedItem().toString();
         final String Username = user.getUsername();
+        final String Date = txtDate.getText().toString();
 
 
         class GetWorkout extends AsyncTask<Void, Void, String> {
@@ -285,11 +308,12 @@ public class MainActivity extends AppCompatActivity {
                                 vals.getInt("meterstrav"),
                                 vals.getInt("metersgalopp"),
                                 vals.getInt("stops"),
+                                vals.getInt("speed"),
                                 vals.getInt("rightvolt"),
                                 vals.getInt("leftvolt")
                         );
 
-
+                        SharedPrefManager.getInstance(getApplicationContext()).workout(workout);
 
                     } else {
                         Toast.makeText(getApplicationContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
@@ -306,8 +330,9 @@ public class MainActivity extends AppCompatActivity {
 
                 //creating request parameters
                 HashMap<String, String> params = new HashMap<>();
-                params.put("name", HorseName);
+                params.put("horsename", HorseName);
                 params.put("username", Username);
+                params.put("date", Date);
 
                 //returing the response
                 return requestHandler.sendPostRequest(URLs.URL_GETWORKOUT, params);
@@ -316,4 +341,6 @@ public class MainActivity extends AppCompatActivity {
         GetWorkout gw = new GetWorkout();
         gw.execute();
     }
+
+
 }

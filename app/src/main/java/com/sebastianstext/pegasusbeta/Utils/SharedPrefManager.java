@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sebastianstext.pegasusbeta.DataStorage.Horse;
 import com.sebastianstext.pegasusbeta.DataStorage.User;
+import com.sebastianstext.pegasusbeta.DataStorage.Workout;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
 
 import java.lang.reflect.Type;
@@ -20,13 +21,18 @@ public class SharedPrefManager {
     private static final String KEY_USERNAME = "keyusername";
     private static final String KEY_EMAIL = "keyemail";
     private static final String KEY_ID = "keyid";
-    private static final String KEY_SPEED = "keyspeed";
-    private static final String KEY_STOPS = "keystops";
     private static final String KEY_DIST = "keydist";
     private static final String KEY_NAME = "keyname";
     private static final String KEY_HEIGHT = "keyheight";
     private static final String KEY_BREED = "keybreed";
-    private static final String[] KEY_NAMEARRAY = new String[0];
+    private static final String KEY_METERS = "meters";
+    private static final String KEY_METERSSKRITT = "metersskritt";
+    private static final String KEY_METERSTRAV = "meters";
+    private static final String KEY_METERSGALLOPP = "metersgallopp";
+    private static final String KEY_STOPS = "stops";
+    private static final String KEY_RIGHTVOLT = "rightvolt";
+    private static final String KEY_LEFTVOLT = "leftvolt";
+    private static final String KEY_SPEED = "speed";
 
     private static SharedPrefManager mInstance;
     private static Context mCtx;
@@ -82,13 +88,17 @@ public class SharedPrefManager {
 
 
 
-    public void workouts(WorkoutsList workoutsList){
+    public void workout(Workout workout){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_USERNAME, workoutsList.getUser());
-        editor.putInt(KEY_STOPS, workoutsList.getNmbrstops());
-        editor.putString(KEY_SPEED, workoutsList.getAvrgspeed());
-        editor.putInt(KEY_DIST, workoutsList.getMeters());
+        editor.putInt(KEY_METERS, workout.getMeters());
+        editor.putInt(KEY_STOPS, workout.getStops());
+        editor.putInt(KEY_SPEED, workout.getSpeed());
+        editor.putInt(KEY_METERSGALLOPP, workout.getMetersgalopp());
+        editor.putInt(KEY_METERSSKRITT, workout.getMetersskritt());
+        editor.putInt(KEY_METERSTRAV, workout.getMeterstrav());
+        editor.putInt(KEY_RIGHTVOLT, workout.getRightvolt());
+        editor.putInt(KEY_LEFTVOLT, workout.getLeftvolt());
         editor.apply();
     }
 
@@ -119,13 +129,17 @@ public class SharedPrefManager {
         );
     }
 
-    public WorkoutsList getWorkout(){
+    public Workout getWorkout(){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        return new WorkoutsList(
-                sharedPreferences.getString(KEY_USERNAME, null),
+        return new Workout(
+                sharedPreferences.getInt(KEY_METERS, -1),
                 sharedPreferences.getInt(KEY_STOPS, -1),
-                sharedPreferences.getString(KEY_SPEED, null),
-                sharedPreferences.getInt(KEY_DIST, -1)
+                sharedPreferences.getInt(KEY_SPEED, -1),
+                sharedPreferences.getInt(KEY_METERSGALLOPP, -1),
+                sharedPreferences.getInt(KEY_METERSSKRITT, -1),
+                sharedPreferences.getInt(KEY_METERSTRAV, -1),
+                sharedPreferences.getInt(KEY_RIGHTVOLT, -1),
+                sharedPreferences.getInt(KEY_LEFTVOLT, -1)
         );
     }
 

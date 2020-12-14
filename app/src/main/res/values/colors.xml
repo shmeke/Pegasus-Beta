@@ -2,9 +2,9 @@
 <resources>
 
 
-    <color name="colorPrimary">#FFC400</color>
-    <color name="colorPrimaryDark">#FF6F00</color>
-    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorPrimary">#1DD1BE</color>
+    <color name="colorPrimaryDark">#22B5A5</color>
+    <color name="colorAccent">#22B5A5</color>
     <!-- 1st Gradient color -->
     <color name="colorPurple_A400">#D500F9</color>
     <color name="colorPurple_900">#4A148C</color>

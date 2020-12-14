@@ -88,18 +88,22 @@ public class SharedPrefManager {
 
 
 
-    public void workout(Workout workout){
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(KEY_METERS, workout.getMeters());
-        editor.putInt(KEY_STOPS, workout.getStops());
-        editor.putInt(KEY_SPEED, workout.getSpeed());
-        editor.putInt(KEY_METERSGALLOPP, workout.getMetersgalopp());
-        editor.putInt(KEY_METERSSKRITT, workout.getMetersskritt());
-        editor.putInt(KEY_METERSTRAV, workout.getMeterstrav());
-        editor.putInt(KEY_RIGHTVOLT, workout.getRightvolt());
-        editor.putInt(KEY_LEFTVOLT, workout.getLeftvolt());
+    public void saveWorkoutlistList(ArrayList<String> list, String key){
+        SharedPreferences prefs = SharedPrefManager.mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
         editor.apply();
+
+    }
+
+    public ArrayList<String> getWorkoutList(String key){
+        SharedPreferences prefs = SharedPrefManager.mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        return gson.fromJson(json, type);
     }
 
 

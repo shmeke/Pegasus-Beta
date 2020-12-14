@@ -121,8 +121,8 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
         }
 
-        saveSensorValues();
-        delay.delay(1000);
+       // saveSensorValues();
+        //delay.delay(1000);
 
 
 

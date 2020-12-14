@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.AdditionalUserInfoActivity;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
-import com.sebastianstext.pegasusbeta.Utils.DelayUtil;
 import com.sebastianstext.pegasusbeta.Utils.ExpandableListAdapter;
 import com.sebastianstext.pegasusbeta.DataStorage.Horse;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
@@ -37,6 +37,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,18 +45,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     User user;
     Workout workout;
     EditText txtDate;
-    TextView txtUsername;
+    TextView txtUsername, txtWorkout;
     ImageButton btnDropdown;
     Button start, stop;
     Calendar calendar;
     DatePickerDialog Dpd;
-    private Spinner horseSpinner;
+    private Spinner horseSpinner, spinnerWorkout;
     ArrayList<String> HorseList = new ArrayList<>();
+    ArrayList<String> WorkoutList = new ArrayList<>();
     private ExpandableListView listView;
     private ExpandableListAdapter listAdapter;
     private List<String> listDataHeader;
@@ -72,16 +75,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         user = SharedPrefManager.getInstance(this).getUser();
         workout = SharedPrefManager.getInstance(this).getWorkout();
         horseSpinner = findViewById(R.id.spinnerHorse);
+        spinnerWorkout = findViewById(R.id.spinnerWorkout);
+        txtWorkout = findViewById(R.id.txtWorkout);
         txtUsername = findViewById(R.id.txtUsername);
         txtDate = findViewById(R.id.editTextDate);
         btnDropdown = findViewById(R.id.buttonDropdown);
         txtUsername.setText("Inloggad som: " + user.getUsername());
         start = findViewById(R.id.buttonStart);
         stop = findViewById(R.id.buttonStop);
-        listView = findViewById(R.id.listdist);
-        initData();
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
-        listView.setAdapter(listAdapter);
+
         horseSpinner.setOnItemSelectedListener(this);
         btnDropdown.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,7 +166,48 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void initData() {
+    public void putValues(){
+        ArrayList<String> countWorkouts = new ArrayList<>();
+
+        WorkoutList = SharedPrefManager.getInstance(getApplicationContext()).getWorkoutList("workoutlist");
+        int listSize = WorkoutList.size();
+        int i;
+        for(i = 0; i < listSize; i++){
+            int passID = i + 1;
+            countWorkouts.add("Pass: " + passID);
+        }
+
+        if(countWorkouts != null){
+            ArrayAdapter<String> workoutsArray = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, countWorkouts);
+            workoutsArray.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerWorkout.setAdapter(workoutsArray);
+        }
+
+        spinnerWorkout.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                initData(i);
+                listView = findViewById(R.id.listdist);
+
+                listAdapter = new ExpandableListAdapter(MainActivity.this, listDataHeader, listHash);
+                listView.setAdapter(listAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        txtWorkout.setText("Du har gjort " + WorkoutList.size() + " ridpass detta datum.");
+
+
+
+
+
+
+    }
+
+    private void initData(int i) {
         listDataHeader = new ArrayList<>();
         listHash = new HashMap<>();
 
@@ -172,26 +215,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listDataHeader.add("Volter");
         listDataHeader.add("Andra");
 
+        try{
+            JSONObject jObj = new JSONObject(WorkoutList.get(i));
+            Log.i("tagconvertstr", String.valueOf(jObj));
 
-        List<String> dist = new ArrayList<>();
-        dist.add("Total distans:" + workout.getMeters());
-        dist.add("Distans skrittat:");
-        dist.add("Distans travat:");
-        dist.add("Distans galopperat:");
 
-        List<String> volt = new ArrayList<>();
-        volt.add("Antal höger volter:");
-        volt.add("Antal vänster volter:");
+            List<String> dist = new ArrayList<>();
+            dist.add("Total distans: " + jObj.getInt("meters"));
+            dist.add("Distans skrittat: " + jObj.getInt("metersskritt"));
+            dist.add("Distans travat: " + jObj.getInt("meterstrav"));
+            dist.add("Distans galopperat: " + jObj.getInt("metersgallopp"));
 
-        List<String> others = new ArrayList<>();
-        others.add("Antal stopp:");
-        others.add("Hastighet;");
+            List<String> volt = new ArrayList<>();
+            volt.add("Antal höger volter: " + jObj.getInt("voltright"));
+            volt.add("Antal vänster volter: " + jObj.getInt("voltleft"));
 
-        listHash.put(listDataHeader.get(0),dist);
-        listHash.put(listDataHeader.get(1),volt);
-        listHash.put(listDataHeader.get(2), others);
+            List<String> others = new ArrayList<>();
+            others.add("Antal stopp: " + jObj.getInt("stops"));
+            others.add("Hastighet: " + jObj.getInt("speed"));
 
-    }
+            listHash.put(listDataHeader.get(0),dist);
+            listHash.put(listDataHeader.get(1),volt);
+            listHash.put(listDataHeader.get(2), others);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+ }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -293,33 +343,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 try {
 
-                    //converting response to json object
-                    JSONObject obj = new JSONObject(response);
+                    String json = response.replace(":\"[{", ":[{");
+                    String jsonSecond = json.replace("}]\"", "}]");
+                    String jsonFinal = jsonSecond.replace("\\\"", "\"");
 
-                    //if no error in response
-                    if (!obj.getBoolean("error")) {
-                        Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
 
-                        //getting the user from the response
-                        JSONObject vals = obj.getJSONObject("workout");
+                    JSONObject obj = new JSONObject(jsonFinal);
 
-                        //creating a new user object
-                        Workout workout = new Workout(
-                                vals.getInt("meters"),
-                                vals.getInt("metersskritt"),
-                                vals.getInt("meterstrav"),
-                                vals.getInt("metersgalopp"),
-                                vals.getInt("stops"),
-                                vals.getInt("speed"),
-                                vals.getInt("rightvolt"),
-                                vals.getInt("leftvolt")
-                        );
+                    ArrayList<String> WorkoutList = new ArrayList<>();
+                    //getting the user from the response
 
-                        SharedPrefManager.getInstance(getApplicationContext()).workout(workout);
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
+                    JSONArray jArray = obj.getJSONArray("workout");
+                    for(int i = 0; i < jArray.length(); i++){
+                        JSONObject jObj = jArray.getJSONObject(i);
+                        WorkoutList.add(jObj.getString("workout"));
                     }
+
+                    SharedPrefManager.getInstance(getApplicationContext()).saveWorkoutlistList(WorkoutList, "workoutlist");
+                    putValues();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

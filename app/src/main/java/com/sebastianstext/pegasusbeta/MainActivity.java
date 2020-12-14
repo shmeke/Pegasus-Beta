@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.AdditionalUserInfoActivity;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
+import com.sebastianstext.pegasusbeta.Utils.DelayUtil;
 import com.sebastianstext.pegasusbeta.Utils.ExpandableListAdapter;
 import com.sebastianstext.pegasusbeta.DataStorage.Horse;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private HashMap<String, List<String>> listHash;
     String spinnerItem;
 
+
     @SuppressLint("WrongViewCast")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         txtUsername.setText("Inloggad som: " + user.getUsername());
         start = findViewById(R.id.buttonStart);
         stop = findViewById(R.id.buttonStop);
-        listView = findViewById(R.id.listDist);
+        listView = findViewById(R.id.listdist);
         initData();
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
         listView.setAdapter(listAdapter);

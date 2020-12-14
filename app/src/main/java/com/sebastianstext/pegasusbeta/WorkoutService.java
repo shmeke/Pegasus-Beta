@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -20,19 +19,16 @@ import com.sebastianstext.pegasusbeta.Listeners.rotationListener;
 import com.sebastianstext.pegasusbeta.Listeners.stepListener;
 import com.sebastianstext.pegasusbeta.SensorDetectors.RotationDetector;
 import com.sebastianstext.pegasusbeta.SensorDetectors.StepDetector;
+import com.sebastianstext.pegasusbeta.Utils.DelayUtil;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
 import com.sebastianstext.pegasusbeta.DataStorage.User;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Timer;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class WorkoutService extends Service implements stepListener, rotationListener, SensorEventListener {
@@ -61,8 +57,8 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     private String horseName;
     private static final int RESET_TIMER = 1000;
     private static final int FINAL_RESET_TIMER = 5000;
+    DelayUtil delay = new DelayUtil();
     @SuppressLint("SimpleDateFormat")
-    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     Time start;
     Time oldTimeLeft = new Time(System.currentTimeMillis());
     Time oldTimeRight = new Time(System.currentTimeMillis());
@@ -104,6 +100,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             try {
                 simpleStepDetector.updateAccel(
@@ -123,11 +120,19 @@ public class WorkoutService extends Service implements stepListener, rotationLis
             }
 
         }
+
+        saveSensorValues();
+        delay.delay(1000);
+
+
+
     }
 
 
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void detectTurn(float currentDegree, float oldDegree, long turnTime, long lastTurnTime) throws ParseException {
+    public void detectTurn(float currentDegree, float oldDegree, long turnTime, long lastTurnTime) {
 
 
         if(oldDegree > currentDegree + 6.5f){
@@ -215,7 +220,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void tempWorkout(long timeNs,  long lastStepTimeNs, float velocityEstimate, float oldVelocityEstimate) throws ParseException {
+    public void tempWorkout(long timeNs,  long lastStepTimeNs, float velocityEstimate, float oldVelocityEstimate) {
         numSteps++;
         long startStep = lastStepTimeNs;
         oldVelEst = oldVelocityEstimate;
@@ -339,5 +344,36 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         UpdateWorkoutSession uws = new UpdateWorkoutSession();
         uws.execute();
     }
+
+    public void saveSensorValues(){
+        final String Id = String.valueOf(user.getId());
+        final String Username = user.getUsername();
+        final String Horsename = horseName;
+        final String NewVelocity = String.valueOf(newVelEst);
+        final String OldVelocity = String.valueOf(oldVelEst);
+        final String Steptime = String.valueOf(stepTimeFin);
+
+
+        class SaveSensorValues extends AsyncTask<Void, Void, String>{
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                RequestHandler requestHandler = new RequestHandler();
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("id", Id);
+                params.put("username", Username);
+                params.put("horsename", Horsename);
+                params.put("newvelocity", NewVelocity);
+                params.put("oldvelocity", OldVelocity);
+                params.put("steptime", Steptime);
+
+                return requestHandler.sendPostRequest(URLs.URL_SENSORVALS, params);
+            }
+        }
+        SaveSensorValues sv = new SaveSensorValues();
+        sv.execute();
+    }
+
 
 }

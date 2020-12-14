@@ -9,5 +9,5 @@ public class URLs {
     public static final String URL_WORKOUT = ROOT_URL + "workout";
     public static final String URL_GETHORSE = ROOT_URL + "gethorse";
     public static final String URL_GETWORKOUT = ROOT_URL + "getworkouts";
-
+    public static final String URL_SENSORVALS = ROOT_URL + "sensorvals";
 }

@@ -34,6 +34,12 @@
         android:hint="Password"
         android:inputType="textPassword" />
 
+    <CheckBox
+        android:id="@+id/checkBoxStayIn"
+        android:layout_width="392dp"
+        android:layout_height="wrap_content"
+        android:text="Håll mig inloggad" />
+
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"

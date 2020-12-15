@@ -1,7 +1,6 @@
 package com.sebastianstext.pegasusbeta.Utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
@@ -9,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 import com.sebastianstext.pegasusbeta.DataStorage.Horse;
 import com.sebastianstext.pegasusbeta.DataStorage.User;
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
-import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -33,6 +31,7 @@ public class SharedPrefManager {
     private static final String KEY_RIGHTVOLT = "rightvolt";
     private static final String KEY_LEFTVOLT = "leftvolt";
     private static final String KEY_SPEED = "speed";
+    private static final String KEY_ISCHECKED = "isChecked";
 
     private static SharedPrefManager mInstance;
     private static Context mCtx;
@@ -59,10 +58,21 @@ public class SharedPrefManager {
         editor.apply();
     }
 
+    public void staySignedIn(boolean isChecked) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_ISCHECKED, isChecked);
+        editor.commit();
+    }
+
+    public boolean isItChecked(){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(KEY_ISCHECKED, false);
+    }
+
     public void putHorse(Horse horse) {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_NAME, horse.getName());
         editor.putString(KEY_BREED, horse.getBreed());
         editor.putInt(KEY_HEIGHT, horse.getHeight());
         editor.apply();
@@ -126,7 +136,6 @@ public class SharedPrefManager {
     public Horse getHorse() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return new Horse(
-                sharedPreferences.getString(KEY_NAME, null),
                 sharedPreferences.getInt(KEY_HEIGHT, -1),
                 sharedPreferences.getString(KEY_BREED, null)
 
@@ -153,6 +162,6 @@ public class SharedPrefManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
-        mCtx.startActivity(new Intent(mCtx, LoginActivity.class));
+
     }
 }

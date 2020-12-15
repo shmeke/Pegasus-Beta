@@ -2,11 +2,14 @@ package com.sebastianstext.pegasusbeta.UserRelatedClasses;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,14 +32,34 @@ import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
     EditText editTextUsername, editTextPassword;
+    CheckBox staySignedIn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        staySignedIn = findViewById(R.id.checkBoxStayIn);
         editTextUsername = findViewById(R.id.editTextUsername);
         editTextPassword = findViewById(R.id.editTextPassword);
+
+
+
+        staySignedIn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                SharedPrefManager.getInstance(getApplicationContext()).staySignedIn(isChecked);
+            }
+        });
+
+
+
+        if(SharedPrefManager.getInstance(getApplicationContext()).isItChecked()) {
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
+            return;
+        }
 
 
         //if user presses on login

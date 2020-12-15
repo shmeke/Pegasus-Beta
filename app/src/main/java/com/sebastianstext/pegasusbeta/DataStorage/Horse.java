@@ -6,8 +6,7 @@ public class Horse {
     private int height;
 
 
-    public Horse (String name, int height, String breed) {
-        this.name = name;
+    public Horse (int height, String breed) {
         this.breed = breed;
         this.height = height;
     }

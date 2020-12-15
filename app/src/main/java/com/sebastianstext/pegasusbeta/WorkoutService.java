@@ -121,7 +121,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
 
         }
 
-       // saveSensorValues();
+       //
         //delay.delay(1000);
 
 
@@ -279,6 +279,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         oldStepCount = numSteps;
 
         kps = (km) / (timeElapsed * 3600);
+        saveSensorValues();
     }
 
     @Override

@@ -3,6 +3,10 @@ package com.sebastianstext.pegasusbeta;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
+import com.sebastianstext.pegasusbeta.Listeners.startListener;
+import com.sebastianstext.pegasusbeta.SensorDetectors.StartDetector;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.AdditionalUserInfoActivity;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
 import com.sebastianstext.pegasusbeta.Utils.ExpandableListAdapter;
@@ -47,11 +53,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, startListener {
     User user;
     Workout workout;
     EditText txtDate;
-    TextView txtUsername, txtWorkout;
+    TextView txtWorkout, txtY;
     ImageButton btnDropdown;
     Button start, stop;
     Calendar calendar;
@@ -64,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHash;
     String spinnerItem;
+    SensorManager sm;
+    Sensor sensor;
+    StartDetector startDetector;
 
 
     @SuppressLint("WrongViewCast")
@@ -77,14 +86,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         horseSpinner = findViewById(R.id.spinnerHorse);
         spinnerWorkout = findViewById(R.id.spinnerWorkout);
         txtWorkout = findViewById(R.id.txtWorkout);
-        txtUsername = findViewById(R.id.txtUsername);
         txtDate = findViewById(R.id.editTextDate);
         btnDropdown = findViewById(R.id.buttonDropdown);
-        txtUsername.setText("Inloggad som: " + user.getUsername());
         start = findViewById(R.id.buttonStart);
         stop = findViewById(R.id.buttonStop);
 
-        horseSpinner.setOnItemSelectedListener(this);
+        sm = (SensorManager)getSystemService(SENSOR_SERVICE);
+        sensor = sm.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        startDetector = new StartDetector();
+        startDetector.registerListener(this);
+        txtY = findViewById(R.id.txtY);
+        sm.registerListener(MainActivity.this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         btnDropdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,18 +166,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+    horseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            spinnerItem = horseSpinner.getSelectedItem().toString();
+            getHorseInformation();
+        }
 
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    });
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        spinnerItem = horseSpinner.getSelectedItem().toString();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 
     public void putValues(){
         ArrayList<String> countWorkouts = new ArrayList<>();
@@ -262,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 return true;
             case R.id.logout:
                 finish();
+                SharedPrefManager.getInstance(getApplicationContext()).logout();
                 Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
                 i2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i2);
@@ -273,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void getHorseInformation(){
         final String HorseName =  horseSpinner.getSelectedItem().toString();
+        final String Username = user.getUsername();
 
 
         class GetHorseInformation extends AsyncTask<Void, Void, String> {
@@ -288,19 +305,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     //if no error in response
                     if (!obj.getBoolean("error")) {
-                        Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
 
                         //getting the user from the response
-                        JSONObject userJson = obj.getJSONObject("user");
+                        JSONObject userJson = obj.getJSONObject("horse");
 
                         //creating a new user object
                         Horse horse = new Horse(
-                                userJson.getString("name"),
                                 userJson.getInt("height"),
                                 userJson.getString("breed")
                         );
 
-
+                        SharedPrefManager.getInstance(getApplicationContext()).putHorse(horse);
 
                     } else {
                         Toast.makeText(getApplicationContext(), "Some error occurred", Toast.LENGTH_SHORT).show();
@@ -318,9 +333,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //creating request parameters
                 HashMap<String, String> params = new HashMap<>();
                 params.put("name", HorseName);
+                params.put("username", Username);
 
                 //returing the response
-                return requestHandler.sendPostRequest(URLs.URL_REGISTER, params);
+                return requestHandler.sendPostRequest(URLs.URL_HORSEINFO, params);
             }
         }
 
@@ -386,4 +402,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
+            startDetector.startWorkout(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    @Override
+    public void startSession(boolean startCommand, float y) {
+
+        txtY.setText(startCommand + " " + y);
+    }
 }

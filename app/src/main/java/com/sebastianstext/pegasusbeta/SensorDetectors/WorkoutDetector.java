@@ -64,7 +64,7 @@ public class WorkoutDetector implements stepListener {
             stopListener.stopCommand(true);
         }
 
-        
+      
 
     }
 

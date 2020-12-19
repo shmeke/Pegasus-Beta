@@ -32,6 +32,7 @@ public class SharedPrefManager {
     private static final String KEY_LEFTVOLT = "leftvolt";
     private static final String KEY_SPEED = "speed";
     private static final String KEY_ISCHECKED = "isChecked";
+    private static final String KEY_SPINNERITEM = "spinneritem";
 
     private static SharedPrefManager mInstance;
     private static Context mCtx;
@@ -45,6 +46,18 @@ public class SharedPrefManager {
             mInstance = new SharedPrefManager(context);
         }
         return mInstance;
+    }
+
+    public void saveSpinnerItem(String item){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_SPINNERITEM, item);
+        editor.apply();
+    }
+
+    public String getSpinnerItem(){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_SPINNERITEM, null);
     }
 
     //method to let the user login

@@ -16,7 +16,11 @@
         android:usesCleartextTraffic="true">
 
         <service
-            android:name=".WorkoutService"
+            android:name=".Services.WorkoutService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Services.StartWorkoutService"
             android:enabled="true"
             android:exported="true" />
 

@@ -3,10 +3,7 @@ package com.sebastianstext.pegasusbeta;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,8 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
-import com.sebastianstext.pegasusbeta.Listeners.startListener;
-import com.sebastianstext.pegasusbeta.SensorDetectors.StartDetector;
+import com.sebastianstext.pegasusbeta.Services.StartWorkoutService;
+import com.sebastianstext.pegasusbeta.Services.WorkoutService;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.AdditionalUserInfoActivity;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.LoginActivity;
 import com.sebastianstext.pegasusbeta.Utils.ExpandableListAdapter;
@@ -51,9 +48,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, startListener {
+public class MainActivity extends AppCompatActivity {
     User user;
     Workout workout;
     EditText txtDate;
@@ -69,10 +65,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ExpandableListAdapter listAdapter;
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHash;
-    String spinnerItem;
-    SensorManager sm;
-    Sensor sensor;
-    StartDetector startDetector;
+
+    private String spinnerItem;
 
 
     @SuppressLint("WrongViewCast")
@@ -87,16 +81,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         spinnerWorkout = findViewById(R.id.spinnerWorkout);
         txtWorkout = findViewById(R.id.txtWorkout);
         txtDate = findViewById(R.id.editTextDate);
+        txtY = findViewById(R.id.txtY);
         btnDropdown = findViewById(R.id.buttonDropdown);
         start = findViewById(R.id.buttonStart);
         stop = findViewById(R.id.buttonStop);
 
-        sm = (SensorManager)getSystemService(SENSOR_SERVICE);
-        sensor = sm.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        startDetector = new StartDetector();
-        startDetector.registerListener(this);
-        txtY = findViewById(R.id.txtY);
-        sm.registerListener(MainActivity.this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+
 
         btnDropdown.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 Intent i = new Intent(MainActivity.this, WorkoutService.class);
                 stopService(i);
                 Toast.makeText(MainActivity.this, "Ridpass avslutat.", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -170,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             spinnerItem = horseSpinner.getSelectedItem().toString();
+            SharedPrefManager.getInstance(getApplicationContext()).saveSpinnerItem(spinnerItem);
+            txtY.setText(SharedPrefManager.getInstance(getApplicationContext()).getSpinnerItem());
             getHorseInformation();
         }
 
@@ -178,6 +172,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         }
     });
+    }
+
+
+    public void onPause() {
+        super.onPause();
+
+        Intent i = new Intent(MainActivity.this, StartWorkoutService.class);
+        startService(i);
+        Toast.makeText(MainActivity.this, "Service Started", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -402,21 +405,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if(sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION){
-            startDetector.startWorkout(sensorEvent.timestamp, sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]);
-        }
-    }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
-    @Override
-    public void startSession(boolean startCommand, float y) {
-
-        txtY.setText(startCommand + " " + y);
-    }
 }

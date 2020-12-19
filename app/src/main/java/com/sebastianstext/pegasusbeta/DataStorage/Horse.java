@@ -2,7 +2,7 @@ package com.sebastianstext.pegasusbeta.DataStorage;
 
 public class Horse {
 
-    private String breed, name;
+    private String breed;
     private int height;
 
 
@@ -11,7 +11,6 @@ public class Horse {
         this.height = height;
     }
 
-    public String getName() { return name; }
     public String getBreed() { return breed; }
     public int getHeight() { return height; }
 

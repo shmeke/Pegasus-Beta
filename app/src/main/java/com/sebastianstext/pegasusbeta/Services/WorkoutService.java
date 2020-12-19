@@ -1,4 +1,4 @@
-package com.sebastianstext.pegasusbeta;
+package com.sebastianstext.pegasusbeta.Services;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -11,27 +11,33 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
 import com.sebastianstext.pegasusbeta.DataStorage.Horse;
+import com.sebastianstext.pegasusbeta.Listeners.energyListener;
 import com.sebastianstext.pegasusbeta.Listeners.rotationListener;
 import com.sebastianstext.pegasusbeta.Listeners.stepListener;
 import com.sebastianstext.pegasusbeta.SensorDetectors.RotationDetector;
 import com.sebastianstext.pegasusbeta.SensorDetectors.StepDetector;
+import com.sebastianstext.pegasusbeta.SensorDetectors.WorkoutDetector;
 import com.sebastianstext.pegasusbeta.Utils.DelayUtil;
 import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
 import com.sebastianstext.pegasusbeta.DataStorage.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Time;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Timer;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
-public class WorkoutService extends Service implements stepListener, rotationListener, SensorEventListener {
+public class WorkoutService extends Service implements stepListener, rotationListener, SensorEventListener, energyListener {
     public WorkoutService() {
     }
 
@@ -47,11 +53,12 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     Sensor accel;
     Sensor rotation;
     private StepDetector simpleStepDetector;
+    private WorkoutDetector workoutDetector;
     private RotationDetector turnDetect;
     private int numSteps, movementType, stepsTrav, stepsSkritt, stepsGallop;
     private int leftTurn, rightTurn, fullLeftVolt, fullRightVolt,quarterVoltLeft, quarterVoltRight, oldStepCount, stopCount, getTurnDirection;
     private double meters, metersTrav, metersSkritt, metersGallop, km, kps;
-    private float oldVelEst, newVelEst;
+    private float oldVelEst, newVelEst, energyVal;
     private long stepTime;
     float stepTimeFin;
     private String horseName;
@@ -68,8 +75,6 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         super.onStartCommand(intent, startId, startId);
-        Bundle extras = intent.getExtras();
-        horseName = extras.getString("spinnerItem");
 
         return START_STICKY;
     }
@@ -85,6 +90,8 @@ public class WorkoutService extends Service implements stepListener, rotationLis
         simpleStepDetector.registerListener(this);
         turnDetect = new RotationDetector();
         turnDetect.registerListener(this);
+        workoutDetector = new WorkoutDetector();
+        workoutDetector.registerEneryListener(this);
         user = SharedPrefManager.getInstance(WorkoutService.this).getUser();
         horse = SharedPrefManager.getInstance(WorkoutService.this).getHorse();
 
@@ -283,15 +290,18 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy(){
         super.onDestroy();
         updateWorkoutSession();
     }
 
+
+
+
     public void updateWorkoutSession(){
         final String id = String.valueOf(user.getId());
         final String username = user.getUsername();
-        final String horsename = horseName;
+        final String horsename = SharedPrefManager.getInstance(getApplicationContext()).getSpinnerItem();
         final String metersTravelled = String.valueOf(meters);
         final String averageSpeed = String.valueOf(kps);
         final String stops = String.valueOf(stopCount);
@@ -337,6 +347,19 @@ public class WorkoutService extends Service implements stepListener, rotationLis
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
 
+                try {
+                    Log.i("tagconvertstr", s);
+                    JSONObject jObj = new JSONObject(s);
+
+                    if(!jObj.getBoolean("error")){
+
+                        Toast.makeText(getApplicationContext(), jObj.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
 
             }
 
@@ -349,10 +372,11 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     public void saveSensorValues(){
         final String Id = String.valueOf(user.getId());
         final String Username = user.getUsername();
-        final String Horsename = horseName;
+        final String Horsename = SharedPrefManager.getInstance(getApplicationContext()).getSpinnerItem();
         final String NewVelocity = String.valueOf(newVelEst);
         final String OldVelocity = String.valueOf(oldVelEst);
         final String Steptime = String.valueOf(stepTimeFin);
+        final String EnergyVal = String.valueOf(energyVal);
 
 
         class SaveSensorValues extends AsyncTask<Void, Void, String>{
@@ -368,6 +392,7 @@ public class WorkoutService extends Service implements stepListener, rotationLis
                 params.put("newvelocity", NewVelocity);
                 params.put("oldvelocity", OldVelocity);
                 params.put("steptime", Steptime);
+                params.put("energyVal", EnergyVal);
 
                 return requestHandler.sendPostRequest(URLs.URL_SENSORVALS, params);
             }
@@ -377,4 +402,8 @@ public class WorkoutService extends Service implements stepListener, rotationLis
     }
 
 
+    @Override
+    public void energyTrans(float Energy) {
+        energyVal = Energy;
+    }
 }

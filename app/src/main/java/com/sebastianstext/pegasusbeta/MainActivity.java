@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sebastianstext.pegasusbeta.DataStorage.Workout;
+import com.sebastianstext.pegasusbeta.DataStorage.WorkoutDates;
 import com.sebastianstext.pegasusbeta.Services.StartWorkoutService;
 import com.sebastianstext.pegasusbeta.Services.WorkoutService;
 import com.sebastianstext.pegasusbeta.UserRelatedClasses.AdditionalUserInfoActivity;
@@ -36,16 +40,23 @@ import com.sebastianstext.pegasusbeta.Utils.RequestHandler;
 import com.sebastianstext.pegasusbeta.Utils.SharedPrefManager;
 import com.sebastianstext.pegasusbeta.Utils.URLs;
 import com.sebastianstext.pegasusbeta.DataStorage.User;
+import com.sebastianstext.pegasusbeta.adapter.DateSlider;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String, List<String>> listHash;
 
     private String spinnerItem;
+    private List<WorkoutDates> datesList = new ArrayList<>();
+    private RecyclerView dateRecycler;
+    private DateSlider dateSlider;
 
 
     @SuppressLint("WrongViewCast")
@@ -81,32 +95,16 @@ public class MainActivity extends AppCompatActivity {
         spinnerWorkout = findViewById(R.id.spinnerWorkout);
         txtWorkout = findViewById(R.id.txtWorkout);
         txtDate = findViewById(R.id.editTextDate);
-        txtY = findViewById(R.id.txtY);
-        btnDropdown = findViewById(R.id.buttonDropdown);
-        start = findViewById(R.id.buttonStart);
-        stop = findViewById(R.id.buttonStop);
 
 
+        dateRecycler = findViewById(R.id.dateslider);
+        dateRecycler.addItemDecoration(new DividerItemDecoration(MainActivity.this, LinearLayoutManager.HORIZONTAL));
+        dateSlider = new DateSlider(datesList, getApplicationContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
+        dateRecycler.setLayoutManager(linearLayoutManager);
+        dateRecycler.setAdapter(dateSlider);
 
-
-        btnDropdown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                calendar = Calendar.getInstance();
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                int month = calendar.get(Calendar.MONTH);
-                int year = calendar.get(Calendar.YEAR);
-
-                Dpd = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int mYear, int mMonth, int mDay) {
-
-                        txtDate.setText(mYear + "-" + (mMonth + 1) + "-" + mDay);
-                    }
-                }, day, month, year);
-                Dpd.show();
-            }
-        });
+        pupulateDateSlider();
 
 
         txtDate.addTextChangedListener(new TextWatcher() {
@@ -136,34 +134,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, WorkoutService.class);
-                i.putExtra("spinnerItem", spinnerItem);
-                startService(i);
-                Toast.makeText(MainActivity.this, "Ridpass startat.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        stop.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
-
-                Intent i = new Intent(MainActivity.this, WorkoutService.class);
-                stopService(i);
-                Toast.makeText(MainActivity.this, "Ridpass avslutat.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
     horseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             spinnerItem = horseSpinner.getSelectedItem().toString();
             SharedPrefManager.getInstance(getApplicationContext()).saveSpinnerItem(spinnerItem);
-            txtY.setText(SharedPrefManager.getInstance(getApplicationContext()).getSpinnerItem());
+
             getHorseInformation();
         }
 
@@ -172,6 +148,21 @@ public class MainActivity extends AppCompatActivity {
 
         }
     });
+    }
+    public void pupulateDateSlider(){
+        Date startDate = new Date();
+        Date endDate = new Date();
+        endDate.getTime();
+
+        Calendar c = Calendar.getInstance();
+        startDate.setDate(2020-11-11);
+
+        for(Date date = startDate; !date.after(endDate); c.setTime(date), c.add(Calendar.DATE,1)){
+                    WorkoutDates vals = new WorkoutDates(String.valueOf(c));
+            datesList.add(vals);
+        }
+
+
     }
 
 
@@ -403,7 +394,6 @@ public class MainActivity extends AppCompatActivity {
         GetWorkout gw = new GetWorkout();
         gw.execute();
     }
-
 
 
 }
